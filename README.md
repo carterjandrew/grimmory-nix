@@ -33,7 +33,7 @@ its web interface and API from one configurable listener; the module exposes
 that listener through `services.grimmory.listenAddress` and
 `services.grimmory.port`.
 
-There is another easy alternative for hosting Grimmory on NixOS through [Nix Podman Services Implementation](https://tarow.github.io/nix-podman-stacks/docs/stacks/grimmory.html)
+There is another easy alternative for hosting Grimmory on NixOS through [Nix Podman Stacks Implementation](https://tarow.github.io/nix-podman-stacks/docs/stacks/grimmory.html)
 
 ## Usage
 
