@@ -28,7 +28,7 @@
 > tool that takes a unique approach to package management and system configuration by making builds reproducible, declarative, and reliable.
 
 
-This flake packages Grimmory and provides a NixOS module. Grimmory serves
+This repo packages Grimmory and provides a nix package, a flake, and a NixOS module. Grimmory serves
 its web interface and API from one configurable listener; the module exposes
 that listener through `services.grimmory.listenAddress` and
 `services.grimmory.port`.
