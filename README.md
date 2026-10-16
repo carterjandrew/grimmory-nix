@@ -35,6 +35,23 @@ that listener through `services.grimmory.listenAddress` and
 
 ## Usage
 
+> [!WARNING]
+> Before enabling the module:
+>
+> - Create `services.grimmory.database.passwordFile` outside the Nix store,
+>   *preferably with a secret manager like [sops](https://github.com/Mic92/sops-nix)*. The file must exist before Grimmory
+>   starts and contain the database password as a single non-empty line.
+> - Grimmory listens on port `6060` and its local MariaDB instance listens on
+>   port `3306` by default. You can change these with
+>   `services.grimmory.port` and `services.grimmory.database.port`. Changing
+>   the local database port changes the machine-wide MariaDB listener, so make
+>   sure it does not conflict with other services using that database server.
+> - This module does not configure a reverse proxy or TLS. By default Grimmory
+>   listens only on `127.0.0.1`; configure your own nginx, Caddy, or other
+>   reverse proxy to make it accessible remotely. Alternatively, explicitly
+>   change `listenAddress` and `openFirewall` if you intend to expose the
+>   application directly.
+
 Add the flake as an input:
 
 ```nix
