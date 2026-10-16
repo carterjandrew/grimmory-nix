@@ -68,6 +68,70 @@ The password file is required for both local and external databases. It is
 loaded with systemd credentials rather than copied into the Nix store. With a
 secret manager, make sure the file exists before `grimmory.service` starts.
 
+### Importing the module as plain source
+
+You can consume this repository as plain source instead of using its flake
+outputs. The surrounding system can still be a flake; setting `flake = false`
+makes the input available as a source tree:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    grimmory-nix = {
+      url = "github:carterjandrew/grimmory-nix";
+      flake = false;
+    };
+  };
+
+  outputs =
+    { nixpkgs, grimmory-nix, ... }:
+    {
+      nixosConfigurations.my-server = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          "${grimmory-nix}/nixos"
+          {
+            services.grimmory = {
+              enable = true;
+              port = 6060;
+              database.passwordFile = "/run/secrets/grimmory-database-password";
+            };
+          }
+        ];
+      };
+    };
+}
+```
+
+For a system that does not use flakes at all, pin the repository with
+`builtins.fetchTarball` and import its `nixos` directory from
+`configuration.nix`:
+
+```nix
+{ ... }:
+
+let
+  grimmory-nix = builtins.fetchTarball {
+    # Pin this to a release tag or commit rather than a moving branch.
+    url = "https://github.com/carterjandrew/grimmory-nix/archive/<revision>.tar.gz";
+    sha256 = "<nix-prefetch-url --unpack output>";
+  };
+in
+{
+  imports = [ "${grimmory-nix}/nixos" ];
+
+  services.grimmory = {
+    enable = true;
+    port = 6060;
+    database.passwordFile = "/run/secrets/grimmory-database-password";
+  };
+}
+```
+
+The module builds its default Grimmory package from the same source tree, so
+neither import style requires a separate package overlay.
+
 ### External database
 
 ```nix
