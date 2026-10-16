@@ -244,6 +244,13 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
         LoadCredential = [ "database-password:${cfg.database.passwordFile}" ];
+
+        CapabilityBoundingSet = "";
+        NoNewPrivileges = true;
+        PrivateDevices = true;
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectSystem = "strict";
       };
       script = ''
         password="$(<"$CREDENTIALS_DIRECTORY/database-password")"
@@ -266,12 +273,14 @@ in
 
       environment = cfg.environment;
       serviceConfig = {
-        Type = "simple";
+        Type = "exec";
         User = cfg.user;
         Group = cfg.group;
         ExecStart = startScript;
+        WorkingDirectory = cfg.stateDir;
         Restart = "on-failure";
         RestartSec = 5;
+        UMask = "0077";
         EnvironmentFile = cfg.environmentFiles;
         LoadCredential = [ "database-password:${cfg.database.passwordFile}" ];
         ReadWritePaths = [
