@@ -1,3 +1,5 @@
+If you like this code you could help get it on nixpkgs. Star the repo, or reply to [this discussion post](https://discourse.nixos.org/t/grimmory-package-and-service/80600) to show your interest.
+
 # Grimmory for NixOS
 
 <div align="center">
