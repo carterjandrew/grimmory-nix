@@ -47,7 +47,7 @@ that listener through `services.grimmory.listenAddress` and
 >   the local database port changes the machine-wide MariaDB listener, so make
 >   sure it does not conflict with other services using that database server.
 > - This module does not configure a reverse proxy or TLS. By default Grimmory
->   listens only on `127.0.0.1`; configure your own nginx, Caddy, or other
+>   listens only on `127.0.0.1`; configure your own [nginx](https://search.nixos.org/options?channel=26.05&query=services.nginx&type=options), [Caddy](https://search.nixos.org/options?channel=26.05&query=services.caddy&type=options), or other
 >   reverse proxy to make it accessible remotely. Alternatively, explicitly
 >   change `listenAddress` and `openFirewall` if you intend to expose the
 >   application directly.
