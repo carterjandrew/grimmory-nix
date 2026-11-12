@@ -60,6 +60,7 @@ Add the flake as an input:
 
   outputs = { nixpkgs, grimmory, ... }: {
     nixosConfigurations.host = nixpkgs.lib.nixosSystem {
+      # Use "aarch64-linux" on a 64-bit ARM server.
       system = "x86_64-linux";
       modules = [
         grimmory.nixosModules.default
@@ -193,6 +194,24 @@ nix build .#grimmory
 nix flake check
 ```
 
-The package supports `x86_64-linux` and `aarch64-linux`. The NixOS integration
-test runs on `x86_64-linux` and verifies local MariaDB provisioning, the web UI,
-the health endpoint, restart behavior, and use of a non-default port.
+The flake exposes native packages and NixOS integration checks for both
+`x86_64-linux` and `aarch64-linux`. On an ARM server, setting
+`system = "aarch64-linux"` in `nixosSystem` is sufficient; the module selects
+the ARM package automatically.
+
+To build and run the ARM integration test from an x86_64 NixOS development
+machine, run:
+
+```console
+nix build .#aarch64-vm-test
+```
+
+This target cross-builds the complete ARM guest on x86_64, then runs it with an
+x86_64 test driver and QEMU ARM emulation. It does not require binfmt or a
+remote ARM builder, but the initial cross-build and emulated test can be slow.
+It is therefore not part of the default x86_64 `nix flake check`.
+
+The test verifies the guest architecture, local MariaDB provisioning, PDFium's
+ARM native library, the web UI, the health endpoint, restart behavior, and use
+of a non-default port. Running `nix flake check` natively on an ARM machine
+performs the same module test there.

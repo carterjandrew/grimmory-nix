@@ -66,6 +66,19 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   gradleBuildTask = "bootJar -x test";
 
+  # Keep both Linux native classifiers in deps.json. The package build selects
+  # only the classifier for its host platform, but a dependency refresh must
+  # retain both so the same source tree remains buildable on x86_64 and ARM64.
+  gradleUpdateScript = ''
+    runHook preBuild
+    runHook preGradleUpdate
+
+    gradle --parallel -PtargetPlatform=linux/amd64 -PtargetArch=amd64 nixDownloadDeps
+    gradle --parallel -PtargetPlatform=linux/arm64 -PtargetArch=arm64 nixDownloadDeps
+
+    runHook postGradleUpdate
+  '';
+
   buildPhase = ''
     runHook preBuild
 
@@ -89,8 +102,18 @@ stdenv.mkDerivation (finalAttrs: {
       --add-flags "--enable-native-access=ALL-UNNAMED" \
       --add-flags "--enable-preview" \
       --add-flags "-jar $out/share/grimmory/grimmory.jar" \
-      --prefix PATH : ${lib.makeBinPath [ ffmpeg-headless kepubify ]} \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libarchive stdenv.cc.cc ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          ffmpeg-headless
+          kepubify
+        ]
+      } \
+      --prefix LD_LIBRARY_PATH : ${
+        lib.makeLibraryPath [
+          libarchive
+          stdenv.cc.cc
+        ]
+      }
 
     runHook postInstall
   '';
@@ -101,7 +124,10 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/grimmory-tools/grimmory/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.agpl3Only;
     mainProgram = "grimmory";
-    platforms = [ "x86_64-linux" "aarch64-linux" ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
     sourceProvenance = with lib.sourceTypes; [
       fromSource
       binaryBytecode
